@@ -1,5 +1,4 @@
 let fields = [null, null, null, null, null, null, null, null, null];
-
 const WINNING_COMBINATIONS = [
   [0, 1, 2],
   [3, 4, 5],
@@ -10,7 +9,6 @@ const WINNING_COMBINATIONS = [
   [0, 4, 8],
   [2, 4, 6], // diagonal
 ];
-
 let currentPlayer = 'circle';
 
 function init() {
@@ -45,20 +43,17 @@ function handleClick(cell, index) {
       currentPlayer === 'circle' ? generateCircleSVG() : generateCrossSVG();
     cell.onclick = null;
     currentPlayer = currentPlayer === 'circle' ? 'cross' : 'circle';
-
     if (isGameFinished()) {
       const winCombination = getWinningCombination();
       drawWinningLine(winCombination);
     }
   }
 }
-
 function isGameFinished() {
   return (
     fields.every((field) => field !== null) || getWinningCombination() !== null
   );
 }
-
 function getWinningCombination() {
   for (let i = 0; i < WINNING_COMBINATIONS.length; i++) {
     const [a, b, c] = WINNING_COMBINATIONS[i];
@@ -72,7 +67,6 @@ function getWinningCombination() {
   }
   return null;
 }
-
 function generateCircleSVG() {
   const color = '#00B0EF';
   const width = 70;
@@ -113,6 +107,10 @@ function drawWinningLine(combination) {
   const startRect = startCell.getBoundingClientRect();
   const endRect = endCell.getBoundingClientRect();
 
+  const contentRect = document
+    .getElementById('content')
+    .getBoundingClientRect();
+
   const lineLength = Math.sqrt(
     Math.pow(endRect.left - startRect.left, 2) +
       Math.pow(endRect.top - startRect.top, 2)
@@ -127,8 +125,18 @@ function drawWinningLine(combination) {
   line.style.width = `${lineLength}px`;
   line.style.height = `${lineWidth}px`;
   line.style.backgroundColor = lineColor;
-  line.style.top = `${startRect.top + startRect.height / 2 - lineWidth / 2} px`;
-  line.style.left = `${startRect.left + startRect.width / 2} px`;
+  line.style.top = `${
+    startRect.top + startRect.height / 2 - lineWidth / 2 - contentRect.top
+  }px`;
+  line.style.left = `${
+    startRect.left + startRect.width / 2 - contentRect.left
+  }px`;
   line.style.transform = `rotate(${lineAngle}rad)`;
+  line.style.transformOrigin = `top left`;
   document.getElementById('content').appendChild(line);
+}
+
+function resetGame() {
+  fields = [null, null, null, null, null, null, null, null, null];
+  render();
 }
